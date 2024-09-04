@@ -19,15 +19,15 @@ namespace AnhPD
         [SerializeField] private HingeJoint joint;
         [SerializeField] private AnchorHook currentHook;
         public Rigidbody rb;
-
+        [SerializeField] private Bird previousSleepyBird;
+        [SerializeField] private List<Bird> followingSleepyBirds = new List<Bird>();
 
         [Header("Attribute")]
         public COLOR color;
         [SerializeField] private List<SfxType> hitSfxs;
         [SerializeField] private LAND_STATE state = LAND_STATE.NONE;
         private bool isCanTouch = false;
-        private Bird previousSleepyBird;
-        private List<Bird> followingSleepyBirds = new List<Bird>();
+
         private Basket currentBasket;
 
         public void OnInit(COLOR skinColor)
@@ -158,6 +158,8 @@ namespace AnhPD
     #region sleepyBird
         public void UnFreeze()
         {
+            ChangeLandState(LAND_STATE.NONE);
+
             rb.useGravity = true;
 
             rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY;

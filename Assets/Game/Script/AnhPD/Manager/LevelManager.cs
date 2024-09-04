@@ -12,7 +12,7 @@ namespace AnhPD
 
         private ColorBaskets lastColorBaskets;
 
-        private int index = 2;
+        private int index = 2, completeCount = 0;
 
         private void Start()
         {
@@ -49,18 +49,38 @@ namespace AnhPD
                 SimplePool.Release(lastColorBaskets);
             });
 
+            completeCount++;
+            if (completeCount == data.colorBaskets.Count)
+            {
+                OnCompleteLevel();
+            }
+
             currentColorBaskets = nextColorBaskets;
             currentColorBaskets.isMoving = true;
-            currentColorBaskets.transform.DOMoveX(0f, .5f).OnComplete(() =>
+            currentColorBaskets?.transform.DOMoveX(0f, .5f).OnComplete(() =>
             {
                 currentColorBaskets.isMoving = false;
             });
 
-            nextColorBaskets = SimplePool.Spawn<ColorBaskets>(PoolType.ColorBaskets);
-            nextColorBaskets.transform.localPosition = new Vector3(-5f, 0, 0);
-            nextColorBaskets.transform.DOMoveX(-3.5f, 1f);
-        }
 
+            if (index < data.colorBaskets.Count)
+            {
+                nextColorBaskets = SimplePool.Spawn<ColorBaskets>(PoolType.ColorBaskets);
+                nextColorBaskets.OnInit(data.colorBaskets[index].numberOfBasket, data.colorBaskets[index].color);
+                nextColorBaskets.transform.localPosition = new Vector3(-5f, 0, 0);
+                nextColorBaskets.transform.DOMoveX(-3.5f, 1f);
+
+                index++;
+            }
+            else
+            {
+                nextColorBaskets = null;
+            }
+        }
+        private void OnCompleteLevel()
+        {
+            Debug.Log("Complete");
+        }
         public void OnLose()
         {
             Debug.Log("Lose");
