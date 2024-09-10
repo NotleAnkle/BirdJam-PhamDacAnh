@@ -13,6 +13,7 @@ namespace AnhPD
         [Header("Reference")]
         [SerializeField] private SkinnedMeshRenderer[] skins;
         [SerializeField] private Material[] materials;
+        [SerializeField] private Material outlineMaterial;
         [SerializeField] private Animator animator;
         [SerializeField] private GameObject eyelidL, eyelidR;
         [SerializeField] private SphereCollider collide;
@@ -26,9 +27,17 @@ namespace AnhPD
         public COLOR color;
         [SerializeField] private List<SfxType> hitSfxs;
         [SerializeField] private LAND_STATE state = LAND_STATE.NONE;
-        private bool isCanTouch = false;
+        [SerializeField] private bool isCanTouch = false;
 
         private Basket currentBasket;
+
+        private void OnEnable()
+        {
+            if (isCanTouch)
+            {
+                EnableOutline();
+            }
+        }
 
         public void OnInit(COLOR skinColor)
         {
@@ -40,9 +49,14 @@ namespace AnhPD
             previousSleepyBird = null;
             followingSleepyBirds = new List<Bird>();
         }
+        public void InitColor(COLOR skinColor)
+        {
+            color = skinColor;
+            ChangeSkinClor(skinColor);
+        }
         private void OnMouseDown()
         {
-            if (!isCanTouch) return;
+            if (!isCanTouch || !LevelManager.Ins.isAllowOnMouseDown) return;
             switch (state)
             {
                 case LAND_STATE.COLOR_BASKET:
@@ -53,7 +67,7 @@ namespace AnhPD
                 case LAND_STATE.NONE:
                     OnFall();
                     break;
-                case LAND_STATE.SLEEPY:
+                case LAND_STATE.FREEZE:
                     UnFreeze();
                     break;
             }
@@ -69,7 +83,7 @@ namespace AnhPD
         }
 
         Sequence sequence;
-        public void OnStartFlying(Vector3 pos)
+        public void OnStartFlying(Basket basket)
         {
             OnBirdAwake();
 
@@ -83,15 +97,20 @@ namespace AnhPD
                 flyduration = .5f;
             }
 
-            sequence.Append(transform.DOMove(pos + Vector3.up * .5f, flyduration).SetEase(Ease.InBack));
-            sequence.Append(transform.DOMove(pos, .25f));
+            SetCurrentBasket(basket);
+
+            sequence.Append(transform.DOMove(basket.TF.position + Vector3.up * .5f, flyduration).SetEase(Ease.InBack));
+            sequence.Append(transform.DOMove(basket.TF.position, .25f));
             sequence.OnComplete(() =>
             {
                 ChangeAnim(CONSTANTS.ANIM_IDLE);
+                currentBasket.OnBirdCompleteFlying();
+
                 collide.enabled = (state != LAND_STATE.COLOR_BASKET);
-                if(state == LAND_STATE.COLOR_BASKET )
+
+                if (state == LAND_STATE.COLOR_BASKET )
                 {
-                    LevelManager.Ins.CheckColorBaskets(this);
+                    LevelManager.Ins.CheckColorBaskets();
                 }
             });
         }
@@ -131,19 +150,19 @@ namespace AnhPD
                     case LAND_STATE.NONE:
                         currentHook?.OnCollide();
                         break;
-                    case LAND_STATE.SLEEPY:
+                    case LAND_STATE.FREEZE:
                         Bird bird = collision.gameObject.GetComponent<Bird>();
                         if(bird.state == LAND_STATE.FALLING)
                         {
                             bird.Freeze(this);
-                            this.DisableOutline();
-                            isCanTouch = false;
-                            followingSleepyBirds.Add(bird);
+                            
+                            AddFollowingSleepyBird(bird);
                         }
                         break;
                 }
             }
         }
+        //hook
         public void SetHook(AnchorHook hook)
         {
             currentHook = hook;
@@ -155,10 +174,27 @@ namespace AnhPD
             joint = gameObject.AddComponent<HingeJoint>();
             joint.connectedBody = rb;
         }
+        //---
+        public bool IsState(LAND_STATE state)
+        {
+            return state == this.state;
+        }
+        public void SetCurrentBasket(Basket basket)
+        {
+            currentBasket?.RemoveBird();
+            currentBasket = basket;
+            currentBasket.SetBird(this);
+            TF.SetParent(currentBasket.TF);
+        }
+        public void OnDespawn()
+        {
+            SimplePool.Despawn(this);
+        }
+
     #region sleepyBird
         public void UnFreeze()
         {
-            ChangeLandState(LAND_STATE.NONE);
+            ChangeLandState(LAND_STATE.UNFREEZE);
 
             rb.useGravity = true;
 
@@ -166,17 +202,26 @@ namespace AnhPD
 
             previousSleepyBird?.OnFollowingSleepyBirdUnFreezy(this);
             DisableOutline();
+
+            StartCoroutine(DelayFalling());
+        }
+        private IEnumerator DelayFalling()
+        {
+            yield return new WaitForSeconds(.3f);
+            if(state == LAND_STATE.UNFREEZE)
+            {
+                ChangeLandState(LAND_STATE.FALLING);
+            }
         }
         public void Freeze(Bird bird)
         {
-            if (state != LAND_STATE.FALLING) return;
             previousSleepyBird = bird;
             rb.constraints = RigidbodyConstraints.FreezeAll;
 
             rb.velocity = Vector3.zero;
             rb.useGravity = false;
 
-            state = LAND_STATE.SLEEPY;
+            state = LAND_STATE.FREEZE;
             EnableOutline();
         }
         public void OnFollowingSleepyBirdUnFreezy(Bird bird)
@@ -187,27 +232,37 @@ namespace AnhPD
                 EnableOutline();
             }
         }
+        public void AddFollowingSleepyBird(Bird bird)
+        {
+            isCanTouch = false;
+            DisableOutline();
+            followingSleepyBirds.Add(bird);
+        }
     #endregion
     
     #region outline
         public void EnableOutline()
         {
             isCanTouch = true;
-            skins[0].materials[1].SetFloat("_Scale", 1.075f);
+            if (skins[3].material != outlineMaterial)
+            {
+                skins[3].material = outlineMaterial;
+            }
+
+            skins[3].material.SetFloat("_Scale", 1.1f);
         }
         public void DisableOutline()
         {
-            skins[0].materials[1].SetFloat("_Scale", 0);
+            skins[3].material.SetFloat("_Scale", 0);
         }
     #endregion
 
     #region skin
         private void ChangeSkinClor(COLOR skinColor)
         {
-            Material material = materials[(int)skinColor];
-            for(int i = 0; i < skins.Length; i++)
+            for (int i = 0; i < 3; i++)
             {
-                skins[i].material = material;
+                skins[i].material = materials[(int)skinColor];
             }
         }
         enum EyeState

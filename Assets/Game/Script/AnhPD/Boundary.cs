@@ -6,9 +6,8 @@ namespace AnhPD
 {
     public class Boundary : MonoBehaviour
     {
-        [SerializeField] private Basket[] target;
+        [SerializeField] private Basket[] baskets;
 
-        private int index = -1;
         private void OnTriggerEnter(Collider other)
         {
             if(other.tag == CONSTANTS.TAG_BIRD)
@@ -16,34 +15,30 @@ namespace AnhPD
                 Bird bird = other.GetComponent<Bird>();
                 if (!LevelManager.Ins.AddBirdToColorBaskets (bird))
                 {
-                    Transform pos = GetTargetPosition();
-                    if (Vector3.Distance(transform.position, pos.position) < .5f)
+                    Basket basket = GetTargetPosition();
+                    if (basket == null)
                     {
                         bird.OnBirdAwake();
                         LevelManager.Ins.OnLose();
                     }
                     else
                     {
-                        bird.OnStartFlying(pos.position);
+                        bird.OnStartFlying(basket);
                         bird.ChangeLandState(LAND_STATE.FREE_BASKET);
                     }
                 }
             }
         }
-        private Transform GetTargetPosition()
+        private Basket GetTargetPosition()
         {
-            
-            if(index < target.Length - 1)
+            for(int i = 0; i < baskets.Length; i++)
             {
-                index++;
-                Transform pos = target[index].transform;
-                if (target[index].IsHaveBirdIn)
+                if (!baskets[i].IsHaveBirdIn)
                 {
-                    return GetTargetPosition();
+                    return baskets[i];
                 }
-                return pos;
             }
-            return transform;
+            return null;
         }
     }
 }

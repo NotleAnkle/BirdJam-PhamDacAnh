@@ -14,6 +14,8 @@ namespace AnhPD
 
         private int index = 2, completeCount = 0;
 
+        public bool isAllowOnMouseDown = true;
+
         private void Start()
         {
             InitColorBasket(data.colorBaskets[0], currentColorBaskets);
@@ -28,7 +30,7 @@ namespace AnhPD
 
         public bool AddBirdToColorBaskets(Bird bird)
         {
-            if(bird.color == currentColorBaskets.color && currentColorBaskets.IsAnyBasketLeft)
+            if(bird.color == currentColorBaskets.color && currentColorBaskets.IsAnyBasketLeft() && !currentColorBaskets.isMoving)
             {
                 currentColorBaskets.AddBird(bird);
                 bird.ChangeLandState(LAND_STATE.COLOR_BASKET);
@@ -37,16 +39,16 @@ namespace AnhPD
             }
             return false;
         }
-        public void CheckColorBaskets(Bird bird)
+        public void CheckColorBaskets()
         {
-            currentColorBaskets.CheckComplete(bird);
+            currentColorBaskets.CheckComplete();
         }
         public void OnCompleteColorBaskets()
         {
             lastColorBaskets = currentColorBaskets;
             lastColorBaskets.transform.DOMoveX(5f, .5f).OnComplete(() =>
             {
-                SimplePool.Release(lastColorBaskets);
+                lastColorBaskets.OnDespawn();
             });
 
             completeCount++;

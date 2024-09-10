@@ -12,12 +12,10 @@ namespace AnhPD
         public COLOR color;
         public bool isMoving = false;
 
-        private int index = 0, numberOfBird = 0;
+        int index;
 
         public void OnInit(int num, COLOR color)
         {
-            index = 0;
-            numberOfBird = 0;
             for(int i = 0; i < baskets.Count; i++)
             {
                 SimplePool.Release(baskets[i]);
@@ -35,28 +33,45 @@ namespace AnhPD
             meshRenderer.material = materials[(int)color];
             this.color = color;
         }
-        public bool IsAnyBasketLeft => index < baskets.Count;
+        public bool IsAnyBasketLeft()
+        {
+            for (int i = 0; i < baskets.Count; i++)
+            {
+                if (!baskets[i].IsHaveBirdIn)
+                {
+                    index = i;
+                    return true;
+                }
+            }
+            return false;
+        }
         public void AddBird(Bird bird)
         {
-            if (isMoving) return;
-            bird.OnStartFlying(baskets[index].transform.position);
-            index++;
+            bird.OnStartFlying(baskets[index]);
         }
-        public void CheckComplete(Bird bird)
+        public void CheckComplete()
         {
-            baskets[numberOfBird].SetBird(bird);
-
-            numberOfBird++;
-            if (numberOfBird == baskets.Count)
+            for(int i = 0; i < baskets.Count; i++)
             {
-                OnComplete();
+                if (!baskets[i].IsHaveBirdIn || !baskets[i].IsCompleteFlying)
+                {
+                    return;
+                }
             }
+            OnComplete();
         }
         private void OnComplete()
         {
             LevelManager.Ins.OnCompleteColorBaskets();
         }
-
+        public void OnDespawn()
+        {
+            for(int i = 0; i < baskets.Count;i++)
+            {
+                baskets[i].OnDespawn();
+            }
+            SimplePool.Despawn(this);
+        }
     }
 }
 

@@ -11,7 +11,10 @@ namespace AnhPD
             if (collision.gameObject.tag == CONSTANTS.TAG_BIRD)
             {
                 Bird bird = collision.gameObject.GetComponent<Bird>();
-                bird.Freeze(null);
+                if (bird.IsState(LAND_STATE.FALLING))
+                {
+                    bird.Freeze(null);
+                }
             }
         }
     }

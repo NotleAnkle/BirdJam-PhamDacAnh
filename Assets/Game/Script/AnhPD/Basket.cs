@@ -7,12 +7,29 @@ namespace AnhPD
     public class Basket : GameUnit
     {
         private Bird currentBird;
-        public bool IsHaveBirdIn => currentBird != null;
+        public bool IsHaveBirdIn = false;
+        public bool IsCompleteFlying = true;
 
         public void SetBird(Bird bird)
         {
             currentBird = bird;
-            bird.transform.SetParent(transform);
+            IsHaveBirdIn = true;
+            IsCompleteFlying = false;
+        }
+        public void RemoveBird()
+        {
+            currentBird = null;
+            IsHaveBirdIn = false;
+        }
+        public void OnBirdCompleteFlying()
+        {
+            IsCompleteFlying = true;
+        }
+        public void OnDespawn()
+        {
+            currentBird?.OnDespawn();
+
+            SimplePool.Despawn(this);
         }
     }
 
