@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cd6942c043353e45b162e9f9cd3cd5c, type: 3}
+  m_Name: TutorialData
+  m_EditorClassIdentifier: 
+  unlockDatas:
+  - unlock: 1
+    level: 1
+    featureSprite: {fileID: 0}
+    featureName: 
+    featureDes: 
+    featureAction: 0
+    clip: {fileID: 32900000, guid: 9f8df1f640b373b42b2f02ec56ac66ae, type: 3}
+  - unlock: 1
+    level: 2
+    featureSprite: {fileID: 1110258670, guid: 4f326a08fdb625a4bbee9c7aa539aa96, type: 3}
+    featureName: Sleep Bird
+    featureDes: Awake when on top of the branch
+    featureAction: 2
+    clip: {fileID: 32900000, guid: 9f8df1f640b373b42b2f02ec56ac66ae, type: 3}
+  - unlock: 1
+    level: 5
+    featureSprite: {fileID: 1442776287, guid: 8c99344a3ef10c544996ec5a1db21f7d, type: 3}
+    featureName: Booster Undo
+    featureDes: Move back your last tapped bird
+    featureAction: 1
+    clip: {fileID: 32900000, guid: 9f8df1f640b373b42b2f02ec56ac66ae, type: 3}
+  - unlock: 1
+    level: 6
+    featureSprite: {fileID: -1976949245, guid: 915aee5125eb4784bafb6be8fee17b4b, type: 3}
+    featureName: Egg
+    featureDes: Hatch when on top of the branch
+    featureAction: 2
+    clip: {fileID: 32900000, guid: 9f8df1f640b373b42b2f02ec56ac66ae, type: 3}
+  - unlock: 1
+    level: 9
+    featureSprite: {fileID: -1347487759, guid: bc8ba8e2ec9297d44ba483805dfa1320, type: 3}
+    featureName: House
+    featureDes: Spawn a bird when there are no objects in front of the house
+    featureAction: 2
+    clip: {fileID: 32900000, guid: 9f8df1f640b373b42b2f02ec56ac66ae, type: 3}
+  - unlock: 1
+    level: 10
+    featureSprite: {fileID: -1258131868, guid: a098bb1459f501c488040f9822f95d78, type: 3}
+    featureName: Booster Extra Space
+    featureDes: Add 1 extra space to waiting tiles
+    featureAction: 1
+    clip: {fileID: 32900000, guid: 9f8df1f640b373b42b2f02ec56ac66ae, type: 3}
+  - unlock: 1
+    level: 13
+    featureSprite: {fileID: -539665007, guid: 778fd00725d49044ab15adabc8fbad6b, type: 3}
+    featureName: Cage
+    featureDes: Match a bird with the same color and having a key to break the cage
+    featureAction: 2
+    clip: {fileID: 32900000, guid: 9f8df1f640b373b42b2f02ec56ac66ae, type: 3}
+  - unlock: 1
+    level: 15
+    featureSprite: {fileID: -319543043, guid: f70b0026e6590634b8e05f3225e9a644, type: 3}
+    featureName: Booster Shuffle
+    featureDes: Mix up all birds
+    featureAction: 1
+    clip: {fileID: 32900000, guid: 9f8df1f640b373b42b2f02ec56ac66ae, type: 3}
+  - unlock: 1
+    level: 20
+    featureSprite: {fileID: 2141450745, guid: e793e3fff56c33740873a6566b644361, type: 3}
+    featureName: Booster Magnet
+    featureDes: Match 3 birds instantly
+    featureAction: 1
+    clip: {fileID: 32900000, guid: 9f8df1f640b373b42b2f02ec56ac66ae, type: 3}
+  - unlock: 0
+    level: 0
+    featureSprite: {fileID: 0}
+    featureName: 
+    featureDes: 
+    featureAction: 0
+    clip: {fileID: 0}
