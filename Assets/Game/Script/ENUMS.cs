@@ -23,7 +23,8 @@ public enum LAND_STATE
     FALLING = 0,
     FREE_BASKET = 1,
     COLOR_BASKET = 2,
-    SLEEPY = 3,
+    FREEZE = 3,
+    UNFREEZE = 4,
 }
 
 public enum TYPE
